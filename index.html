@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H M 10-Channel Control Panel</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        body {
+            background-color: #0d1b2a;
+            color: white;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 { font-size: 26px; margin-bottom: 5px; letter-spacing: 2px; color: #e0e1dd; }
+        .sub-title { font-size: 13px; color: #00b4d8; margin-bottom: 30px; }
+        
+        /* බටන් 10 ලස්සනට කොටු විදිහට හැඩගස්වන කොටස */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .ctrl-btn {
+            background: #415a77;
+            border: 3px solid #1b263b;
+            color: #e0e1dd;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .ctrl-btn.active {
+            background: #0077b6;
+            border-color: #00b4d8;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 180, 216, 0.6);
+        }
+        .brand { margin-top: 40px; font-size: 12px; color: #778da9; }
+    </style>
+</head>
+<body>
+
+    <h2>H M Cross-Control</h2>
+    <div class="sub-title">10-CHANNEL SMART CONTROLLER</div>
+
+    <div class="grid-container">
+        <button id="btn1" class="ctrl-btn" onclick="toggleDevice('Device1', 1)">Device 1<br>OFF</button>
+        <button id="btn2" class="ctrl-btn" onclick="toggleDevice('Device2', 2)">Device 2<br>OFF</button>
+        <button id="btn3" class="ctrl-btn" onclick="toggleDevice('Device3', 3)">Device 3<br>OFF</button>
+        <button id="btn4" class="ctrl-btn" onclick="toggleDevice('Device4', 4)">Device 4<br>OFF</button>
+        <button id="btn5" class="ctrl-btn" onclick="toggleDevice('Device5', 5)">Device 5<br>OFF</button>
+        <button id="btn6" class="ctrl-btn" onclick="toggleDevice('Device6', 6)">Device 6<br>OFF</button>
+        <button id="btn7" class="ctrl-btn" onclick="toggleDevice('Device7', 7)">Device 7<br>OFF</button>
+        <button id="btn8" class="ctrl-btn" onclick="toggleDevice('Device8', 8)">Device 8<br>OFF</button>
+        <button id="btn9" class="ctrl-btn" onclick="toggleDevice('Device9', 9)">Device 9<br>OFF</button>
+        <button id="btn10" class="ctrl-btn" onclick="toggleDevice('Device10', 10)">Device 10<br>OFF</button>
+    </div>
+
+    <div class="brand">H M Electronics & Decoration</div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3tWEvW39OSzvOOqccXib9ucAhdzGX9Fg",
+            authDomain: "mysmarthome-b7ffe.firebaseapp.com",
+            databaseURL: "https://mysmarthome-b7ffe-default-rtdb.firebaseio.com",
+            projectId: "mysmarthome-b7ffe",
+            storageBucket: "mysmarthome-b7ffe.firebasestorage.app",
+            messagingSenderId: "312202557084",
+            appId: "1:312202557084:web:c7d6380f9167b32a951f59",
+            measurementId: "G-C91N2L0B6W"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // දැනට බටන් වල තත්වය තියාගන්නා තැන (On ද Off ද කියලා)
+        let deviceStates = {};
+
+        // බටන් එකක් ඔබද්දී Firebase යවන ශ්‍රිතය (Function)
+        function toggleDevice(deviceName, btnNum) {
+            const currentState = deviceStates[deviceName] || 0;
+            const nextState = currentState === 1 ? 0 : 1;
+            database.ref(deviceName).set(nextState);
+        }
+
+        // බටන් 10යේම දත්ත ලයිව් කියවා UI එක අප්ඩේට් කිරීම
+        for (let i = 1; i <= 10; i++) {
+            database.ref('Device' + i).on('value', (snapshot) => {
+                const value = snapshot.val() || 0;
+                deviceStates['Device' + i] = value;
+                
+                const btn = document.getElementById('btn' + i);
+                if (value === 1) {
+                    btn.innerText = "Device " + i + "\nON";
+                    btn.classList.add('active');
+                } else {
+                    btn.innerText = "Device " + i + "\nOFF";
+                    btn.classList.remove('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
